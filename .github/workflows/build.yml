@@ -202,6 +202,25 @@ jobs:
           contains(github.event.pull_request.labels.*.name, 'write-screenshots')
         run: ./gradlew ":app:${{ steps.shots.outputs.update }}" --stacktrace
 
+      # Fork: the working branch has no PR merge-base (unrelated histories), so the
+      # label path is unreachable. On arena/** pushes regenerate the references and
+      # commit them straight back to the branch; the follow-up run's check then
+      # passes and commits nothing (loop terminates after one regeneration).
+      - name: Update screenshot references (arena push: regenerate + commit)
+        if: >-
+          github.event_name == 'push' && startsWith(github.ref, 'refs/heads/arena/')
+        run: |
+          ./gradlew ":app:${{ steps.shots.outputs.update }}" --stacktrace
+          git config user.name "film-ci-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain app/src/screenshotTest*)" ]; then
+            git add app/src/screenshotTest*
+            git commit -m "Regenerate screenshot references after UI change (${GITHUB_SHA})"
+            git push origin "HEAD:${{ github.ref_name }}"
+          else
+            echo "screenshot references unchanged"
+          fi
+
       - uses: actions/upload-artifact@v4
         if: >-
           github.event_name == 'pull_request' &&
