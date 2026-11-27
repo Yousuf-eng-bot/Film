@@ -101,7 +101,9 @@ class VideoPipelineTest {
         assertNotNull(lut)
         assertEquals(2, lut!!.size)
         val dst = FloatArray(3)
-        // Blue-fastest: node (0,0,0) is the first row.
+        // Blue-fastest order (Adobe .cube spec: blue varies fastest, then green, then
+        // red), matching bakeCubeLut's emitter and the ((r*N+g)*N+b) index:
+        // rows: (r0,g0): b0,b1 | (r0,g1): b0,b1 | (r1,g0): b0,b1 | (r1,g1): b0,b1
         lut.apply(0f, 0f, 0f, dst, 0)
         assertTrue(close(dst[0], 0.1f))
         assertTrue(close(dst[1], 0.2f))
@@ -109,8 +111,11 @@ class VideoPipelineTest {
         // Node (0,0,1) is the second row (blue varies fastest).
         lut.apply(0f, 0f, 1f, dst, 0)
         assertTrue(close(dst[0], 0.4f))
-        // Node (0,1,0) is row 5 (after all blue steps for g=0).
+        // Node (0,1,0) is row 2: green steps after all blue entries for g=0.
         lut.apply(0f, 1f, 0f, dst, 0)
+        assertTrue(close(dst[0], 0.7f))
+        // Node (1,0,0) is row 4: red steps after all blue-green entries for r=0.
+        lut.apply(1f, 0f, 0f, dst, 0)
         assertTrue(close(dst[0], 0.2f))
     }
 
