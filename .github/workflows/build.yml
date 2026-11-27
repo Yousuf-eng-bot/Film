@@ -122,23 +122,63 @@ jobs:
           done
 
       - name: Unit tests
+        id: unit
         run: |
           chmod +x ./gradlew
-          ./gradlew :app:testDebugUnitTest --stacktrace
+          set -o pipefail
+          ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee /tmp/gradle-unit.log
 
-      # Fork diagnostic: the sandbox cannot fetch blob-host logs, so always publish
-      # the JUnit XML results (and on compile failure their absence tells us it was
-      # a compilation, not a test, failure). Empty artifact = compile error.
-      - name: Upload unit test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-results
-          path: |
-            app/build/test-results/testDebugUnitTest/*.xml
-            engine/spektra-core/build/test-results/testDebugUnitTest/*.xml
-          if-no-files-found: ignore
-          retention-days: 3
+      # Fork diagnostic: the sandbox cannot fetch blob-host logs or artifact zips,
+      # so on failure publish a parseable summary (failing tests from the JUnit XMLs,
+      # or the Gradle error tail on a compile failure) as a commit comment — that
+      # round-trips through api.github.com, which is reachable from the sandbox.
+      - name: Report unit-test failure summary
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY' > /tmp/failure_report.md
+          import glob
+          import xml.etree.ElementTree as ET
+
+          lines = []
+          seen = 0
+          for f in sorted(glob.glob('app/build/test-results/testDebugUnitTest/*.xml')) + \
+                   sorted(glob.glob('engine/spektra-core/build/test-results/testDebugUnitTest/*.xml')):
+              try:
+                  root = ET.parse(f).getroot()
+              except Exception:
+                  continue
+              for case in root.iter('testcase'):
+                  for kind in ('failure', 'error'):
+                      for node in case.findall(kind):
+                          seen += 1
+                          if seen <= 40:
+                              msg = (node.get('message') or '').replace('\n', ' ')[:400]
+                              lines.append(
+                                  "FAIL %s.%s :: %s" % (case.get('classname'), case.get('name'), msg)
+                              )
+          if seen:
+              print("TEST FAILURES: %d (showing first %d)" % (seen, min(seen, 40)))
+              print("\n".join(lines))
+          else:
+              print("NO TEST RESULT XMLs FOUND -> compilation or setup failure (Gradle tail below)")
+          PY
+          {
+            echo "### Unit-test failure report — run ${{ github.run_id }} @ ${{ github.sha }}"
+            echo
+            cat /tmp/failure_report.md
+            echo
+            echo "<details><summary>Gradle error tail</summary>"
+            echo
+            echo '```'
+            grep -E "^e: |error:|FAILURE:|What went wrong|Caused by|> Task .* FAILED" /tmp/gradle-unit.log | head -n 80 || true
+            echo '```'
+            echo
+            echo "</details>"
+          } > /tmp/report.md
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+            -F body="$(head -c 60000 /tmp/report.md)"
 
       # Screenshot tests (MAD audit fix 5). AGP names the suite's tasks
       # update/test{Suite}{Target}{Variant}TestSuite; the target part is AGP's, so the
