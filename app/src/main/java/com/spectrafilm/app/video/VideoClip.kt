@@ -57,8 +57,8 @@ class VideoClip private constructor(
      */
     fun frameArgb(us: Long, longEdge: Int): Bitmap? {
         val scale = longEdge.toFloat() / maxOf(meta.width, meta.height).coerceAtLeast(1)
-        val targetW = (meta.width * scale).toInt().coerceIn(16, meta.width)
-        val targetH = (meta.height * scale).toInt().coerceIn(16, meta.height)
+        val targetW = (meta.width * scale).toInt().coerceIn(1, meta.width)
+        val targetH = (meta.height * scale).toInt().coerceIn(1, meta.height)
         val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             retriever.getScaledFrameAtTimestamp(us, MediaMetadataRetriever.OPTION_CLOSEST, targetW, targetH)
         } else {
