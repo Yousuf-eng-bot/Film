@@ -1,0 +1,111 @@
+# Android Release — সরল দ্রুত-রিলিজ ওয়ার্কফ্লো
+# Film modeling powered by spektrafilm (GPLv3).
+#
+# কী করে:
+#   • tag v* পুশ হলে (যেমন v1.0.1) → debug APK বিল্ড → GitHub Release-এ আপলোড
+#   • manual dispatch-এও রান করা যায় (version ইনপুট দিয়ে)
+#
+# কেন সরল: আপস্ট্রিম release.yml-এ signed প্রোডাকশন রিলিজের জন্য
+# keystore সিক্রেট + protected environment লাগে। দ্রুত টেস্টের জন্য
+# debug-সাইনড APK-ই যথেষ্ট — Play Store সাইনিং পরে যোগ হবে।
+#
+# ব্যবহার:
+#   git tag v1.0.1 && git push origin v1.0.1
+#   → Actions → Android Release রান হবে → Releases পেজে APK ডাউনলোড
+
+name: Android Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag (e.g. v1.0.1) — tag না থাকলে তৈরি হবে"
+        required: false
+        default: "v1.0.1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    name: Build APK + GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "push" ]; then
+            VERSION="${GITHUB_REF_NAME}"
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${VERSION}"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools ndk;28.2.13676358 cmake;3.22.1 build-tools;36.0.0 platforms;android-37.0
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK (all ABIs)
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Collect APK
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/*.apk dist/
+          ls -lh dist/
+
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Film ${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          body: |
+            ## Film ${{ steps.version.outputs.version }}
+
+            Spectral film simulation for Android — photo editor powered by **spektrafilm**.
+
+            ### Install
+            1. Download the APK below
+            2. Open it (Android asks once to allow installs from browser/file manager)
+            3. Pick a photo → tap a look → export
+
+            Android 7.0+ (arm64 / armv7 / x86_64). No account, no ads, no tracking.
+
+            ### Credits
+            - **Spektrafilm for Android** by **Akshay Sharma** — https://github.com/thetechgeekko/Spektrafilm-android
+            - Film modeling powered by **spektrafilm** (Andrea Volpato) — https://github.com/andreavolpato/spektrafilm
+
+            License: GPLv3. See LICENSE / NOTICE.md.
+          files: dist/*.apk
+          fail_on_unmatched_files: true
