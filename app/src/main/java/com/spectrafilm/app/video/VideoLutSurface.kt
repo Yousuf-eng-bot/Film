@@ -41,7 +41,7 @@ internal data class VideoFrameSubmission(
  * the GL thread uploads and draws. [onUnavailable] fires once if shaders fail to
  * build so the caller can show a plain (CPU) frame instead of a black box.
  */
-class VideoLutView(
+internal class VideoLutView(
     context: Context,
     private val onUnavailable: () -> Unit = {},
 ) : GLSurfaceView(context) {

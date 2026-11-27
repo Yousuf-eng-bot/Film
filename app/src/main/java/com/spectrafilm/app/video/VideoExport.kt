@@ -279,11 +279,11 @@ internal object VideoExport {
 
     private fun fillBlack(image: Image, w: Int, h: Int) {
         val planes = image.planes
-        val y = ByteArray(w * h) { 0x10 }
+        val y = ByteArray(w * h) { 0x10.toByte() }
         copyInto(planes[0], y, w, h)
         val cw = (w + 1) / 2
         val ch = (h + 1) / 2
-        val neutral = ByteArray(cw * ch) { 0x80 }
+        val neutral = ByteArray(cw * ch) { 0x80.toByte() }
         if (planes[1].pixelStride == 2) {
             interleaveUvInto(planes[1], neutral, neutral, cw, ch)
         } else {
