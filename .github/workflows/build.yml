@@ -23,7 +23,9 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    # Fork: also run on the session working branch (Film's releases and work all
+    # happen here; unrelated history from the fork init means no PR merge-base).
+    branches: [main, "arena/**"]
   pull_request:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
