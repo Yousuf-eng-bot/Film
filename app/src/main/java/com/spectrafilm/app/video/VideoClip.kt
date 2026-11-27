@@ -111,21 +111,25 @@ internal class VideoClip private constructor(
          * supported API level, unlike retriever.getTrackFormat which is gone from
          * the compileSdk 37 stubs). UNKNOWN when nothing honest is declared.
          */
-        private fun classifyTrackTransfer(ctx: Context, uri: Uri): VideoTransfer = runCatching {
-            MediaExtractor().use { extractor ->
+        private fun classifyTrackTransfer(ctx: Context, uri: Uri): VideoTransfer {
+            val extractor = MediaExtractor()
+            try {
                 extractor.setDataSource(ctx, uri, null)
                 for (i in 0 until extractor.trackCount) {
                     val format = extractor.getTrackFormat(i)
                     val mime = format.getString(MediaFormat.KEY_MIME) ?: continue
                     if (!mime.startsWith("video/")) continue
-                    return classifyVideoTransfer(
-                        if (format.containsKey(MediaFormat.KEY_COLOR_TRANSFER)) {
-                            format.getInteger(MediaFormat.KEY_COLOR_TRANSFER)
-                        } else null,
-                    )
+                    val transfer = if (format.containsKey(MediaFormat.KEY_COLOR_TRANSFER)) {
+                        format.getInteger(MediaFormat.KEY_COLOR_TRANSFER)
+                    } else null
+                    return classifyVideoTransfer(transfer)
                 }
-                VideoTransfer.UNKNOWN
+                return VideoTransfer.UNKNOWN
+            } catch (_: Exception) {
+                return VideoTransfer.UNKNOWN
+            } finally {
+                extractor.release()
             }
-        }.getOrDefault(VideoTransfer.UNKNOWN)
+        }
     }
 }
