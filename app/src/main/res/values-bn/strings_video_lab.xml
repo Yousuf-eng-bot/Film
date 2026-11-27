@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Film (Yousuf-eng-bot). GPLv3. Video Lab (beta) — বাংলা। -->
+<resources>
+    <string name="video_lab_title">ভিডিও ল্যাব (বেটা)</string>
+    <string name="video_lab_beta_note">বেটা: ভিডিওতে বেক করা LUT দিয়ে ফিল্ম লুক — গ্রেইন/হ্যালেশন এখনো নেই, শব্দ ছাড়া এক্সপোর্ট, শুধু SDR ক্লিপ।</string>
+    <string name="video_lab_no_video">ভিডিওতে ফিল্ম লুক দেখতে একটা ক্লিপ বাছুন।</string>
+    <string name="video_lab_pick">ভিডিও বাছুন</string>
+    <string name="video_lab_pick_another">ভিডিও বদলান</string>
+    <string name="video_lab_play">চালান</string>
+    <string name="video_lab_pause">থামান</string>
+    <string name="video_lab_film">ফিল্ম স্টক</string>
+    <string name="video_lab_paper">প্রিন্ট পেপার</string>
+    <string name="video_lab_baking">ফিল্ম LUT তৈরি হচ্ছে…</string>
+    <string name="video_lab_export">MP4 এক্সপোর্ট</string>
+    <string name="video_lab_export_progress">রেন্ডার হচ্ছে %1$d / %2$d ফ্রেম</string>
+    <string name="video_lab_export_done_q">Pictures/Film-এ সেভ হয়েছে (শব্দ ছাড়া, ফিল্ম LUT)</string>
+    <string name="video_lab_export_done_legacy">সেভ হয়েছে: %1$s</string>
+    <string name="video_lab_export_failed">এক্সপোর্ট ব্যর্থ: %1$s</string>
+    <string name="video_lab_open_failed">ক্লিপটি পড়া যায়নি</string>
+    <string name="video_lab_hdr_unsupported">HDR ক্লিপ এখনো সমর্থিত নয় — SDR ক্লিপ বাছুন</string>
+    <string name="video_lab_gl_unavailable">এই ডিভাইসে GPU প্রিভিউ চলবে না; Video Lab-এর জন্য OpenGL ES 3.0 দরকার</string>
+    <string name="video_lab_back">ফিরে যান</string>
+    <string name="screen_settings_video_lab">ভিডিও ল্যাব (বেটা)</string>
+    <string name="screen_settings_video_lab_note">ভিডিওতে ফিল্ম লুক প্রিভিউ ও এক্সপোর্ট</string>
+</resources>

@@ -338,6 +338,19 @@ internal fun SettingsScreen(
                 },
                 {
                     NavRow(
+                        title = stringResource(R.string.screen_settings_video_lab),
+                        icon = MaterialSymbols.Slideshow,
+                        supporting = stringResource(R.string.screen_settings_video_lab_note),
+                        trailing = MaterialSymbols.ChevronRight,
+                        onClick = {
+                            ctx.startActivity(
+                                android.content.Intent(ctx, com.spectrafilm.app.video.VideoLabActivity::class.java),
+                            )
+                        },
+                    )
+                },
+                {
+                    NavRow(
                         title = stringResource(R.string.screen_settings_show_onboarding),
                         icon = MaterialSymbols.Help,
                         onClick = onShowOnboarding,

@@ -123,6 +123,14 @@
             </intent-filter>
         </activity>
 
+        <!-- Video Lab (Phase 2 beta): a separate, self-contained screen so the editor's
+             still-image source/session machinery is untouched. Launchable from Settings. -->
+        <activity
+            android:name=".video.VideoLabActivity"
+            android:exported="false"
+            android:label="@string/video_lab_title"
+            android:theme="@style/Theme.Spektrafilm" />
+
         <!-- Runs no work of its own: it exists only to keep the process in the
              foreground scheduling group for the duration of an export. mediaProcessing on
              API 35+ (the type for long media transcodes/renders); dataSync below 35, where
