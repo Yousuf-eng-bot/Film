@@ -206,7 +206,7 @@ jobs:
       # label path is unreachable. On arena/** pushes regenerate the references and
       # commit them straight back to the branch; the follow-up run's check then
       # passes and commits nothing (loop terminates after one regeneration).
-      - name: Update screenshot references (arena push: regenerate + commit)
+      - name: "Update screenshot references (arena push - regenerate + commit)"
         if: >-
           github.event_name == 'push' && startsWith(github.ref, 'refs/heads/arena/')
         run: |
