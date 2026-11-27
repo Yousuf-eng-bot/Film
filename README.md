@@ -139,6 +139,13 @@ What each one is good for, and which paper to pair it with, is in
 
 Android 7.0 or later on arm64, 32-bit ARM or x86_64. [Step-by-step install guide.](docs/getting-started.md)
 
+### Video Lab (beta, v1.2.0+)
+
+Settings → **ভিডিও ল্যাব (Video Lab)**: pick an SDR clip, choose a film stock + print
+paper (baked 33³ LUT, GPU preview with play/scrub), export a silent MP4 to
+Pictures/Film. Beta limits: no grain/halation on video yet, silent export, SDR
+clips only. Design + roadmap: [`docs/VIDEO_PLAN.md`](docs/VIDEO_PLAN.md).
+
 ## Project docs (এই ফর্কের)
 
 | Doc | কী |
