@@ -126,6 +126,20 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :app:testDebugUnitTest --stacktrace
 
+      # Fork diagnostic: the sandbox cannot fetch blob-host logs, so always publish
+      # the JUnit XML results (and on compile failure their absence tells us it was
+      # a compilation, not a test, failure). Empty artifact = compile error.
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            app/build/test-results/testDebugUnitTest/*.xml
+            engine/spektra-core/build/test-results/testDebugUnitTest/*.xml
+          if-no-files-found: ignore
+          retention-days: 3
+
       # Screenshot tests (MAD audit fix 5). AGP names the suite's tasks
       # update/test{Suite}{Target}{Variant}TestSuite; the target part is AGP's, so the
       # names are looked up rather than hard-coded. A PR labelled `write-screenshots`
