@@ -59,11 +59,11 @@ object AppUpdater {
     private const val READ_TIMEOUT_MS = 5_000
     private const val API_HOST = "api.github.com"
     private const val BROWSER_HOST = "github.com"
-    private const val REPOSITORY_PATH = "/thetechgeekko/Spektrafilm-android"
+    private const val REPOSITORY_PATH = "/Yousuf-eng-bot/Film"
     private val SHA256_DIGEST = Regex("""sha256:([0-9a-f]{64})""")
     private val HTML_COMMENT = Regex("""<!--.*?-->""", RegexOption.DOT_MATCHES_ALL)
     private const val LATEST_API =
-        "https://api.github.com/repos/thetechgeekko/Spektrafilm-android/releases/latest"
+        "https://api.github.com/repos/Yousuf-eng-bot/Film/releases/latest"
     private val STABLE_TAG = Regex(
         """v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)""",
     )

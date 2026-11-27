@@ -35,7 +35,7 @@ class UpdateControllerTest {
     private val newer = UpdateInfo(
         latestTag = "v0.12.0",
         currentVersion = "0.11.0",
-        releaseUrl = "https://github.com/thetechgeekko/Spektrafilm-android/releases/tag/v0.12.0",
+        releaseUrl = "https://github.com/Yousuf-eng-bot/Film/releases/tag/v0.12.0",
         isNewer = true,
         notes = "## Highlights",
         apk = apk,

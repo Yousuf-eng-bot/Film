@@ -28,7 +28,7 @@ class AboutLegalNoticeTest {
 
     @Test
     fun projectLegalLinksUseCanonicalRepository() {
-        val canonicalRoot = "https://github.com/thetechgeekko/Spektrafilm-android"
+        val canonicalRoot = "https://github.com/Yousuf-eng-bot/Film"
 
         assertTrue(Links.SOURCE.startsWith(canonicalRoot))
         assertTrue(Links.RELEASES.startsWith(canonicalRoot))

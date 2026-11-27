@@ -49,7 +49,7 @@ class UpdateDownloadPolicyTest {
             "https://objects.githubusercontent.com:8443$signed",
             "https://objects.githubusercontent.com/a#frag",
             "/relative/path",
-            "https://github.com/thetechgeekko/Spektrafilm-android",
+            "https://github.com/Yousuf-eng-bot/Film",
             "https://objects.githubusercontent.com/" + "a".repeat(5000),
         ).forEach { assertNull(it.toString(), UpdateDownloadPolicy.allowedRedirect(it)) }
     }

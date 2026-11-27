@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Spektrafilm for Android. GPLv3.
-  Adaptive-icon foreground, "Frame": a strip of 35mm film in the brand amber (#C8892B,
-  the seed of the M3 scheme in Theme.kt) with the spectrum showing through the exposed
+  Adaptive-icon foreground, "Frame": a strip of 35mm film in the Film brand green (#2FA36B,
+  the fork rebrand) with the spectrum showing through the exposed
   frame. Everything sits inside the 66dp safe zone (a circle of radius 33 around 54,54):
   the strip spans 30..78 x 35.5..72.5, so its farthest corner is ~30.3 from the centre.
   Also the splash-screen icon (themes.xml). The spectrum stops match SpektraBrand.spectrum.
@@ -36,7 +36,7 @@
 
     <!-- Film strip with the frame window and sprocket holes cut out -->
     <path
-        android:fillColor="#C8892B"
+        android:fillColor="#2FA36B"
         android:fillType="evenOdd"
         android:pathData="M34,35.5 h40 a4,4 0 0 1 4,4 v29 a4,4 0 0 1 -4,4 h-40 a4,4 0 0 1 -4,-4 v-29 a4,4 0 0 1 4,-4 Z M35.5,46 h37 a1.5,1.5 0 0 1 1.5,1.5 v13 a1.5,1.5 0 0 1 -1.5,1.5 h-37 a1.5,1.5 0 0 1 -1.5,-1.5 v-13 a1.5,1.5 0 0 1 1.5,-1.5 Z M36.5,39.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M44.5,39.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M52.5,39.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M60.5,39.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M68.5,39.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M36.5,64.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M44.5,64.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M52.5,64.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M60.5,64.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z M68.5,64.5 h3 a1,1 0 0 1 1,1 v2 a1,1 0 0 1 -1,1 h-3 a1,1 0 0 1 -1,-1 v-2 a1,1 0 0 1 1,-1 Z" />
 </vector>

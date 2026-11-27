@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Film (Yousuf-eng-bot). GPLv3. -->
+<!-- বাংলা অনুবাদ — প্রথম ধাপ: সবচেয়ে দৃশ্যমান UI স্ট্রিং। বাকি স্ট্রিং ইংরেজিতে ফলব্যাক করবে। -->
+<resources>
+    <string name="app_name">ফিল্ম</string>
+
+    <!-- Editor top bar -->
+    <string name="editor_loading">এডিটর লোড হচ্ছে</string>
+    <string name="editor_action_export">এক্সপোর্ট</string>
+    <string name="editor_action_undo">আনডু</string>
+    <string name="editor_action_redo">রিডু</string>
+    <string name="editor_action_settings">সেটিংস</string>
+    <string name="editor_action_about">অ্যাপ সম্পর্কে</string>
+    <string name="editor_action_more">আরও অপশন</string>
+    <string name="editor_nav_back">ফিরে যান</string>
+    <string name="editor_status_photo_selected">ছবি নির্বাচিত</string>
+    <string name="editor_snack_recipe_restored">এই ছবির সেভ করা এডিট ফিরিয়ে আনা হয়েছে</string>
+    <string name="editor_status_video_unsupported">ভিডিও ক্লিপ এখনো সমর্থিত নয় (মোশন সিমুলেশন চলমান)</string>
+    <string name="editor_snack_video_coming">ভিডিও সিমুলেশন আসছে — আজ ছবি (RAW/DNG সহ) কাজ করে</string>
+
+    <!-- Film / paper browser -->
+    <string name="stock_browser_change">পরিবর্তন</string>
+    <string name="stock_browser_selected">নির্বাচিত</string>
+
+    <!-- Editor categories -->
+    <string name="editor_category_source">সোর্স</string>
+    <string name="editor_category_presets">প্রিসেট</string>
+    <string name="editor_category_input">ইনপুট</string>
+    <string name="editor_category_raw_wb">হোয়াইট ব্যালান্স</string>
+    <string name="editor_category_grain">গ্রেইন</string>
+    <string name="editor_category_halation">হ্যালেশন</string>
+    <string name="editor_category_glare">গ্লেয়ার</string>
+    <string name="editor_category_couplers">কুপলার</string>
+    <string name="editor_category_preflash">প্রি-ফ্ল্যাশ</string>
+    <string name="editor_category_contrast_mask">কনট্রাস্ট মাস্ক</string>
+    <string name="editor_category_experimental">এক্সপেরিমেন্টাল</string>
+    <string name="editor_category_tone_curve">টোন কার্ভ</string>
+    <string name="editor_category_masks">মাস্ক</string>
+    <string name="editor_category_display">ডিসপ্লে</string>
+
+    <!-- Shared screen chrome -->
+    <string name="screen_back">ফিরে যান</string>
+    <string name="screen_close">বন্ধ করুন</string>
+    <string name="screen_report_issue">সমস্যা রিপোর্ট করুন</string>
+    <string name="screen_how_to_use_app">অ্যাপ ব্যবহারের নিয়ম</string>
+    <string name="screen_link_source_code">সোর্স কোড</string>
+    <string name="screen_link_releases">রিলিজ</string>
+    <string name="screen_about_title">অ্যাপ সম্পর্কে</string>
+    <string name="screen_about_version">ভার্সন %1$s (%2$d)</string>
+    <string name="screen_about_open_source_notices">ওপেন-সোর্স নোটিশ</string>
+
+    <!-- Welcome / onboarding -->
+    <string name="screen_intro_look_title">সত্যিকারের ফিল্ম লুক</string>
+    <string name="screen_intro_look_body">আপনার নিজের ছবির জন্য।</string>
+    <string name="screen_intro_tap_title">একটা ফিল্মে ট্যাপ করুন</string>
+    <string name="screen_intro_tap_body">এক ট্যাপে পুরো লুক বদলে যায়।</string>
+    <string name="screen_intro_save_title">সেভ করুন</string>
+    <string name="screen_intro_save_body">ফুল কোয়ালিটিতে, শেয়ারের জন্য তৈরি।</string>
+    <string name="screen_intro_digital">ডিজিটাল</string>
+    <string name="screen_intro_saved">সেভ হয়েছে</string>
+    <string name="screen_welcome_skip">স্কিপ</string>
+    <string name="screen_welcome_next">পরবর্তী</string>
+    <string name="screen_welcome_get_started">শুরু করুন</string>
+    <string name="screen_welcome_page_indicator">পৃষ্ঠা %1$d / %2$d</string>
+
+    <!-- Export basics -->
+    <string name="tool_export_quality">কোয়ালিটি</string>
+    <string name="tool_export_size_heading">সাইজ</string>
+    <string name="tool_export_preset">প্রিসেট</string>
+    <string name="tool_export_more_options">আরও এক্সপোর্ট অপশন</string>
+    <string name="tool_export_include_gps">লোকেশন (GPS) রাখুন</string>
+    <string name="tool_done">হয়ে গেছে</string>
+
+    <!-- Shared widgets -->
+    <string name="widget_advanced_hide">অ্যাডভান্সড অপশন লুকান</string>
+    <string name="widget_advanced_show">অ্যাডভান্সড অপশন দেখান</string>
+    <string name="widget_numeric_entry_set">সেট করুন</string>
+    <string name="widget_numeric_entry_cancel">বাতিল</string>
+    <string name="widget_ae_button_off">অটো</string>
+
+    <plurals name="editor_status_ready_profiles">
+        <item quantity="one">প্রস্তুত · %1$d প্রোফাইল</item>
+        <item quantity="other">প্রস্তুত · %1$d প্রোফাইল</item>
+    </plurals>
+</resources>

@@ -15,10 +15,10 @@ import android.net.Uri
 
 /** Project + author links used by Settings / About / onboarding. */
 object Links {
-    const val SOURCE = "https://github.com/thetechgeekko/Spektrafilm-android/"
-    const val RELEASES = "https://github.com/thetechgeekko/Spektrafilm-android/releases"
-    const val ISSUES = "https://github.com/thetechgeekko/Spektrafilm-android/issues"
-    const val NEW_ISSUE = "https://github.com/thetechgeekko/Spektrafilm-android/issues/new"
+    const val SOURCE = "https://github.com/Yousuf-eng-bot/Film/"
+    const val RELEASES = "https://github.com/Yousuf-eng-bot/Film/releases"
+    const val ISSUES = "https://github.com/Yousuf-eng-bot/Film/issues"
+    const val NEW_ISSUE = "https://github.com/Yousuf-eng-bot/Film/issues/new"
     const val AUTHOR_INSTAGRAM = "https://www.instagram.com/akshay.pool/"
     const val AUTHOR_YOUTUBE = "https://www.youtube.com/@Akshayishere/videos"
     const val SPEKTRAFILM = "https://github.com/Spektrafilm"

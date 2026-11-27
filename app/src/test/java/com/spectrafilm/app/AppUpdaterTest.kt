@@ -42,7 +42,7 @@ class AppUpdaterTest {
         val info = response(
             body = """{
                 "tag_name":"v0.9.1",
-                "html_url":"https://github.com/thetechgeekko/Spektrafilm-android/releases/tag/v0.9.1",
+                "html_url":"https://github.com/Yousuf-eng-bot/Film/releases/tag/v0.9.1",
                 "draft":false,
                 "prerelease":false
             }""".trimIndent(),
@@ -99,12 +99,12 @@ class AppUpdaterTest {
     @Test
     fun maliciousReleaseMetadataCannotChooseAHostPathOrChannel() {
         val badBodies = listOf(
-            validBody(url = "http://github.com/thetechgeekko/Spektrafilm-android/releases/tag/v0.9.1"),
-            validBody(url = "https://github.com.evil.test/thetechgeekko/Spektrafilm-android/releases/tag/v0.9.1"),
-            validBody(url = "https://user@github.com/thetechgeekko/Spektrafilm-android/releases/tag/v0.9.1"),
+            validBody(url = "http://github.com/Yousuf-eng-bot/Film/releases/tag/v0.9.1"),
+            validBody(url = "https://github.com.evil.test/Yousuf-eng-bot/Film/releases/tag/v0.9.1"),
+            validBody(url = "https://user@github.com/Yousuf-eng-bot/Film/releases/tag/v0.9.1"),
             validBody(url = "https://github.com/thetechgeekko/another-repo/releases/tag/v0.9.1"),
-            validBody(url = "https://github.com/thetechgeekko/Spektrafilm-android/releases/tag/v9.9.9"),
-            validBody(url = "https://github.com/thetechgeekko/Spektrafilm-android/releases/tag/v0.9.1?download=1"),
+            validBody(url = "https://github.com/Yousuf-eng-bot/Film/releases/tag/v9.9.9"),
+            validBody(url = "https://github.com/Yousuf-eng-bot/Film/releases/tag/v0.9.1?download=1"),
             validBody(tag = "nightly"),
             validBody(tag = "v${"9".repeat(1_000)}.1.1"),
             validBody(draft = true),
@@ -146,7 +146,7 @@ class AppUpdaterTest {
         val apk = info.apk!!
         assertEquals("Spektrafilm-v0.9.1.apk", apk.name)
         assertEquals(
-            "https://github.com/thetechgeekko/Spektrafilm-android/releases/download/v0.9.1/Spektrafilm-v0.9.1.apk",
+            "https://github.com/Yousuf-eng-bot/Film/releases/download/v0.9.1/Spektrafilm-v0.9.1.apk",
             apk.downloadUrl,
         )
         assertEquals(21_341_655L, apk.sizeBytes)
@@ -157,7 +157,7 @@ class AppUpdaterTest {
                 assets = listOf(
                     apkAsset(
                         name = "Spektrafilm-v0.9.1-engine-boundary-androidTest.apk",
-                        url = "https://github.com/thetechgeekko/Spektrafilm-android/releases/download/v0.9.1/" +
+                        url = "https://github.com/Yousuf-eng-bot/Film/releases/download/v0.9.1/" +
                             "Spektrafilm-v0.9.1-engine-boundary-androidTest.apk",
                     ),
                     apkAsset(),
@@ -171,10 +171,10 @@ class AppUpdaterTest {
 
     @Test
     fun anApkAssetThatIsNotExactlyTheReleaseApkFallsBackToTheReleasePage() {
-        val base = "https://github.com/thetechgeekko/Spektrafilm-android/releases/download"
+        val base = "https://github.com/Yousuf-eng-bot/Film/releases/download"
         val bad = listOf(
             listOf(apkAsset(url = "https://evil.test/Spektrafilm-v0.9.1.apk")),
-            listOf(apkAsset(url = "http://github.com/thetechgeekko/Spektrafilm-android/releases/download/v0.9.1/Spektrafilm-v0.9.1.apk")),
+            listOf(apkAsset(url = "http://github.com/Yousuf-eng-bot/Film/releases/download/v0.9.1/Spektrafilm-v0.9.1.apk")),
             listOf(apkAsset(url = "$base/v9.9.9/Spektrafilm-v0.9.1.apk")),
             listOf(apkAsset(url = "$base/v0.9.1/Spektrafilm-v0.9.1.apk?x=1")),
             listOf(apkAsset(name = "Spektrafilm-v0.9.2.apk")),
@@ -192,7 +192,7 @@ class AppUpdaterTest {
 
     private fun apkAsset(
         name: String = "Spektrafilm-v0.9.1.apk",
-        url: String = "https://github.com/thetechgeekko/Spektrafilm-android/releases/download/v0.9.1/Spektrafilm-v0.9.1.apk",
+        url: String = "https://github.com/Yousuf-eng-bot/Film/releases/download/v0.9.1/Spektrafilm-v0.9.1.apk",
         size: Long = 21_341_655L,
         state: String = "uploaded",
         digest: String = "sha256:" + "a".repeat(64),
@@ -229,7 +229,7 @@ class AppUpdaterTest {
 
     private fun validBody(
         tag: String = "v0.9.1",
-        url: String = "https://github.com/thetechgeekko/Spektrafilm-android/releases/tag/$tag",
+        url: String = "https://github.com/Yousuf-eng-bot/Film/releases/tag/$tag",
         draft: Boolean = false,
         prerelease: Boolean = false,
     ): String = """{
