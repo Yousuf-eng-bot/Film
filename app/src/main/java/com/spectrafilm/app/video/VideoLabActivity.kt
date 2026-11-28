@@ -65,7 +65,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -77,6 +76,7 @@ import com.spectrafilm.app.EngineHolder
 import com.spectrafilm.app.GroupedDropdown
 import com.spectrafilm.app.MaterialSymbols
 import com.spectrafilm.app.R
+import com.spectrafilm.app.SpektraBrand
 import com.spectrafilm.app.SpektraTheme
 import com.spectrafilm.app.StockCatalog
 import com.spectrafilm.app.toGroups
@@ -279,7 +279,7 @@ private fun VideoLabScreen() {
             Modifier
                 .fillMaxWidth()
                 .height(240.dp)
-                .background(Color(0xFF101010)),
+                .background(SpektraBrand.canvasNearBlack) // fixed neutral: the frame is judged on it,
             contentAlignment = Alignment.Center,
         ) {
             val frame = previewFrame
@@ -293,7 +293,7 @@ private fun VideoLabScreen() {
             } else {
                 Text(
                     stringResource(if (m == null) R.string.video_lab_no_video else R.string.video_lab_baking),
-                    color = Color(0xFFB0B0B0),
+                    color = SpektraBrand.onCanvas.copy(alpha = 0.6f),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
