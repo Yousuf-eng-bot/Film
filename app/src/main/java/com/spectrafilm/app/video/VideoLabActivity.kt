@@ -279,8 +279,8 @@ private fun VideoLabScreen() {
             Modifier
                 .fillMaxWidth()
                 .height(240.dp)
-                .background(SpektraBrand.canvasNearBlack) // fixed neutral: the frame is judged on it,
-            contentAlignment = Alignment.Center,
+                    .background(SpektraBrand.canvasNearBlack), // fixed neutral: the frame is judged on it
+                contentAlignment = Alignment.Center,
         ) {
             val frame = previewFrame
             if (frame != null) {
