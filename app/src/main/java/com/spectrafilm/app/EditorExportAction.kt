@@ -345,9 +345,13 @@ internal fun startEditorExport(
                         // decode is still open (SceneHighlightTap). Null otherwise.
                         var sceneTap: SceneLuma? = null
                         val res = restored ?: try {
-                            // #269: one reclaim-and-retry on memory exhaustion.
+                            // #269: one reclaim-and-retry on memory exhaustion. The render
+                            // itself runs under the stall watchdog (RenderStallWatchdog.kt):
+                            // a GPU/driver hang or minutes-long thrash on a small-RAM device
+                            // used to sit at ~11% forever; now it requests a cooperative
+                            // native stop and fails with actionable guidance instead.
                             retryOnceAfterMemoryReclaim("export render") {
-                                runCancellableNative(
+                                withRenderStallWatchdog(
                                     onLateResult = { late ->
                                         late.reportOutcome(AppRenderOutcome.CANCELLED)
                                         late.close()

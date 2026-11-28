@@ -3,6 +3,7 @@
 <resources>
     <string name="video_lab_title">ভিডিও ল্যাব (বেটা)</string>
     <string name="video_lab_beta_note">বেটা: ভিডিওতে বেক করা LUT দিয়ে ফিল্ম লুক — গ্রেইন/হ্যালেশন এখনো নেই, শব্দ ছাড়া এক্সপোর্ট, শুধু SDR ক্লিপ।</string>
+    <string name="video_lab_preview_cd">ফিল্ম লুক সহ ভিডিও প্রিভিউ</string>
     <string name="video_lab_no_video">ভিডিওতে ফিল্ম লুক দেখতে একটা ক্লিপ বাছুন।</string>
     <string name="video_lab_pick">ভিডিও বাছুন</string>
     <string name="video_lab_pick_another">ভিডিও বদলান</string>
@@ -18,7 +19,6 @@
     <string name="video_lab_export_failed">এক্সপোর্ট ব্যর্থ: %1$s</string>
     <string name="video_lab_open_failed">ক্লিপটি পড়া যায়নি</string>
     <string name="video_lab_hdr_unsupported">HDR ক্লিপ এখনো সমর্থিত নয় — SDR ক্লিপ বাছুন</string>
-    <string name="video_lab_gl_unavailable">এই ডিভাইসে GPU প্রিভিউ চলবে না; Video Lab-এর জন্য OpenGL ES 3.0 দরকার</string>
     <string name="video_lab_back">ফিরে যান</string>
     <string name="screen_settings_video_lab">ভিডিও ল্যাব (বেটা)</string>
     <string name="screen_settings_video_lab_note">ভিডিওতে ফিল্ম লুক প্রিভিউ ও এক্সপোর্ট</string>

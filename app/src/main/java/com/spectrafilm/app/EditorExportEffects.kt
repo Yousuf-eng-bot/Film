@@ -230,6 +230,8 @@ internal suspend fun CoroutineScope.runExportRuntimeObserver(
                                     cause.status == com.spectrafilm.libraw.DecodeStatus.NO_MEMORY ->
                                     R.string.editor_msg_export_failed_raw_memory
                                 isMemoryExhaustion(cause) -> R.string.editor_msg_export_failed_memory
+                                cause is ExportRenderStalledException ->
+                                    R.string.editor_msg_export_failed_stalled
                                 else -> R.string.editor_msg_export_failed
                             },
                         )

@@ -3,6 +3,7 @@
 <resources>
     <string name="video_lab_title">Video Lab (beta)</string>
     <string name="video_lab_beta_note">Beta: a film look applied to video via a baked LUT — no grain/halation yet, silent export, SDR clips only.</string>
+    <string name="video_lab_preview_cd">Video preview with the film look</string>
     <string name="video_lab_no_video">Pick a clip to preview a film look on video.</string>
     <string name="video_lab_pick">Choose a video</string>
     <string name="video_lab_pick_another">Change video</string>
@@ -18,7 +19,6 @@
     <string name="video_lab_export_failed">Export failed: %1$s</string>
     <string name="video_lab_open_failed">Could not read that clip</string>
     <string name="video_lab_hdr_unsupported">HDR clips aren\'t supported yet — choose an SDR clip</string>
-    <string name="video_lab_gl_unavailable">This device can\'t run the GPU preview; Video Lab needs OpenGL ES 3.0</string>
     <string name="video_lab_back">Back</string>
     <string name="screen_settings_video_lab">Video Lab (beta)</string>
     <string name="screen_settings_video_lab_note">Preview and export a film look on video</string>

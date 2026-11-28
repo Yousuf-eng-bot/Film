@@ -22,6 +22,25 @@ enum class ExportSize(@StringRes val labelRes: Int, val longEdge: Int?) {
     CUSTOM(R.string.tool_export_size_custom, null),
 }
 
+/**
+ * The size a FRESH install's first export sheet opens with. Set once from the device
+ * memory tier (AppMemoryBudget.configure): a COMPACT device (<= 4 GB RAM, a 512 MiB
+ * budget) seeds LARGE (4096) — a full-resolution render of a modern phone photo
+ * (12–50 MP) needs the 1.5–2 GiB budget tiers, so on a compact device it either runs
+ * for many minutes or trips the OOM-retry ladder, which users read as "stuck at 11%".
+ * The sheet still offers Maximum; the user's own choice always wins afterwards.
+ */
+@Volatile
+internal var defaultExportSize: ExportSize = ExportSize.FULL
+    private set
+
+internal fun initDefaultExportSize(policy: DeviceMemoryPolicy) {
+    defaultExportSize = when (policy.tier) {
+        DeviceMemoryTier.COMPACT -> ExportSize.LARGE
+        else -> ExportSize.FULL
+    }
+}
+
 /** The user's choices in the export sheet. Pure data; the UI binds to it and the pipeline reads it. */
 data class ExportOptions(
     val format: ExportFormat,

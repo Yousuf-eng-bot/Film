@@ -129,6 +129,14 @@ object StockCatalog {
     fun isReversalFilm(ctx: Context, id: String): Boolean = entry(ctx, id)?.isReversal() ?: false
 
     /**
+     * True when the capture film is tungsten-balanced (CineStill 800T, Vision3 200T/500T):
+     * a daylight scene shot on it renders strongly blue — authentic film physics — and
+     * "Balance to film stock" is the one-switch correction. Surfaced as a pick suggestion.
+     */
+    fun isTungstenFilm(ctx: Context, id: String): Boolean =
+        entry(ctx, id)?.balance?.equals("tungsten", ignoreCase = true) ?: false
+
+    /**
      * Build dropdown options for [available] engine profile ids, filtered to a side:
      * "film" keeps capture stocks (kind == "film"), "print" keeps print media
      * (print_paper / print_film). Catalogued options are sorted by group order then

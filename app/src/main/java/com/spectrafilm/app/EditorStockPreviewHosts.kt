@@ -48,11 +48,12 @@ internal fun editorStockPreviewHost(
         val currentFilm = state.filmProfile
         val currentPrint = state.printProfile
         val lastColourPrint = state.lastColourPrint
-        fun variant(film: String?, print: String?) = state.toParams(
+        fun variant(film: String?, print: String?, scanFilm: Boolean? = null) = state.toParams(
             previewMaxSizeOverride = STOCK_PREVIEW_EDGE,
             skipGrainHalation = true,
             filmOverride = film,
             printOverride = print,
+            scanFilmOverride = scanFilm,
         ).copy(filmProfile = "", printProfile = "")
         val silverFilm = SilverPrint.FILMS.first()
         // A film tap re-pairs the paper (SilverPrint.printAfterFilmChange); a paper tap
@@ -63,6 +64,8 @@ internal fun editorStockPreviewHost(
             oldFilm = currentFilm, newFilm = film, print = currentPrint,
             lastColourPrint = lastColourPrint, available = pairable,
         )
+        // Slide-film tiles: scanned directly (Slide mode), never printed.
+        val reversalVariant = variant(null, null, scanFilm = true).copy(printProfile = "")
         val variants: Map<Pair<Boolean, String>, SpektraParams> = if (forFilm) {
             buildMap {
                 for (silver in listOf(false, true)) {
@@ -104,9 +107,17 @@ internal fun editorStockPreviewHost(
                 },
                 paramsFor = { id ->
                     if (forFilm) {
-                        val print = pairedPrint(id)
-                        variants.getValue(SilverPrint.isSilverFilm(id) to print)
-                            .copy(filmProfile = id, printProfile = print)
+                        if (StockCatalog.isReversalFilm(ctx, id)) {
+                            // A slide film is viewed as a positive: a tap turns Slide mode
+                            // on and the print stage never runs. Without this the tile
+                            // printed the reversal film onto negative paper — an inverted,
+                            // muddy image users read as a broken stock (Ektachrome).
+                            reversalVariant.copy(filmProfile = id)
+                        } else {
+                            val print = pairedPrint(id)
+                            variants.getValue(SilverPrint.isSilverFilm(id) to print)
+                                .copy(filmProfile = id, printProfile = print)
+                        }
                     } else {
                         val silver = SilverPrint.isSilverPaper(id)
                         variants.getValue(silver to if (silver) SilverPrint.MULTIGRADE else "")

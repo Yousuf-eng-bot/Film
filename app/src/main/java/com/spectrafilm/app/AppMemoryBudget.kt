@@ -139,6 +139,7 @@ internal object AppMemoryBudget {
                         "snapshot=${NativeMemoryBudgetBridge.snapshotJson()}",
                 )
                 configuredPolicy = policy
+                initDefaultExportSize(policy)
                 policy
             }
         }

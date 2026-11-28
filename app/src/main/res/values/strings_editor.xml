@@ -144,6 +144,10 @@
     <string name="editor_status_recipe_clear_failed">could not clear saved recipe</string>
     <string name="editor_snack_slide_film">%1$s is a slide film — view it as a positive?</string>
     <string name="editor_snack_slide_mode">Slide mode</string>
+    <string name="editor_snack_slide_film_auto">%1$s is a slide film — Slide mode is on so it scans as a positive.</string>
+    <string name="editor_snack_negative_film_print">%1$s is a negative film — back to the print pipeline.</string>
+    <string name="editor_snack_tungsten_film">%1$s is tungsten-balanced: daylight shots turn blue. Correct with one switch?</string>
+    <string name="editor_snack_balance">Balance to stock</string>
     <string name="editor_snack_switched_to">Switched to %1$s</string>
     <string name="editor_snack_use_defaults">Use its defaults</string>
 
@@ -673,6 +677,7 @@
     <string name="editor_hint_scanner">Scanner sharpening and white and black point correction</string>
     <string name="editor_hint_output">Output color space, gamut compression and encoding</string>
     <string name="editor_msg_export_failed">Couldn\'t export this photo. Try again, or pick a smaller size or another format.</string>
+    <string name="editor_msg_export_failed_stalled">The render took too long and was stopped to avoid a frozen app. Try a smaller export size (Size → Large or Medium), or restart the phone and retry.</string>
     <string name="editor_msg_export_failed_memory">Not enough memory to export at this size. Try a smaller size.</string>
     <string name="editor_msg_export_failed_raw_preview">This RAW could only be read as its small embedded preview, so nothing was saved.</string>
     <string name="editor_msg_export_failed_raw_memory">Not enough free memory to read this RAW at full resolution, so nothing was saved. Close other apps and try again.</string>

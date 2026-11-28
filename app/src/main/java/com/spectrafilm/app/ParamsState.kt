@@ -549,6 +549,10 @@ class ParamsState {
         // from these overrides rather than patched onto a finished SpektraParams.
         filmOverride: String? = null,
         printOverride: String? = null,
+        // Stock-preview tiles for a REVERSAL (slide) candidate render as a tap would:
+        // picking a slide film turns Slide mode on (scan directly, no print), so a tile
+        // for one must carry scanFilm=true regardless of the current state's switch.
+        scanFilmOverride: Boolean? = null,
     ): SpektraParams = SpektraParams(
         filmProfile = filmOverride ?: filmProfile,
         printProfile = printOverride ?: printProfile,
@@ -614,7 +618,7 @@ class ParamsState {
             cropCenter = cropCenter,
             cropSize = cropSize,
             upscaleFactor = upscaleFactor,
-            scanFilm = scanFilm,
+            scanFilm = scanFilmOverride ?: scanFilm,
         ),
         settings = SettingsParams(
             rgbToRawMethod = spectralUpsampling,

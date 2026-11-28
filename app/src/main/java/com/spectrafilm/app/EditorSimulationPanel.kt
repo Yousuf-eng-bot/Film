@@ -90,17 +90,36 @@ internal fun EditorSimulationPanel(
                 )
                 if (newPrint != oldPrint) state.printProfile = newPrint
                 val name = StockCatalog.displayName(ctx, id)
-                // A reversal (slide) film is most naturally viewed as a
-                // positive — nudge Slide mode if the print is still showing;
-                // otherwise offer to drop the previous stock's tweaks.
+                // Match the view to the stock chemistry: slide films scan directly
+                // (Slide mode on), negatives run back through the print stage, and
+                // tungsten stocks offer a one-switch balance correction. Each auto
+                // change is undoable; only the first tap after a stock change speaks.
                 if (SilverPrint.isSilverFilm(id) && newPrint != oldPrint) {
                     offerSnackbarSuggestion(scope, snackbarHost,
                         ctx.getString(R.string.editor_snack_silver_paper, StockCatalog.displayName(ctx, newPrint)),
                         ctx.getString(R.string.editor_snack_use_defaults)) { state.resetStockCharacter() }
                 } else if (StockCatalog.isReversalFilm(ctx, id) && !state.scanFilm) {
+                    // A slide film's natural view is the positive, so Slide mode turns ON
+                    // right away instead of waiting for another tap: printing a reversal
+                    // onto negative paper shows an inverted image users read as a broken
+                    // stock (the Ektachrome report). Undo restores the previous switch.
+                    state.scanFilm = true
                     offerSnackbarSuggestion(scope, snackbarHost,
-                        ctx.getString(R.string.editor_snack_slide_film, name),
-                        ctx.getString(R.string.editor_snack_slide_mode)) { state.scanFilm = true }
+                        ctx.getString(R.string.editor_snack_slide_film_auto, name),
+                        ctx.getString(R.string.editor_action_undo)) { state.scanFilm = false }
+                } else if (!StockCatalog.isReversalFilm(ctx, id) && state.scanFilm) {
+                    // Symmetric: a negative film's natural view runs back through the print
+                    // stage. Undo returns to Slide mode if the scan was deliberate.
+                    state.scanFilm = false
+                    offerSnackbarSuggestion(scope, snackbarHost,
+                        ctx.getString(R.string.editor_snack_negative_film_print, name),
+                        ctx.getString(R.string.editor_action_undo)) { state.scanFilm = true }
+                } else if (StockCatalog.isTungstenFilm(ctx, id) && !state.balanceToFilmStock) {
+                    // Tungsten film under daylight IS strongly blue — real chemistry — but
+                    // unexplained it reads as broken. Offer the one-switch correction.
+                    offerSnackbarSuggestion(scope, snackbarHost,
+                        ctx.getString(R.string.editor_snack_tungsten_film, name),
+                        ctx.getString(R.string.editor_snack_balance)) { state.balanceToFilmStock = true }
                 } else {
                     offerSnackbarSuggestion(scope, snackbarHost,
                         ctx.getString(R.string.editor_snack_switched_to, name),

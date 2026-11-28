@@ -105,7 +105,7 @@ internal class ExportViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(
         ExportUiState(
             sheetOpen = false,
-            options = ExportOptions(ExportFormat.JPEG, 95, ExportSize.FULL, 2048, ""),
+            options = ExportOptions(ExportFormat.JPEG, 95, defaultExportSize, 2048, ""),
             keepGps = false,
             phase = EditorExportPhase.IDLE,
             runtimeRunId = null,

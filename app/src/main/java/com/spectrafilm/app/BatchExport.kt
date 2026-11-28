@@ -333,7 +333,7 @@ private suspend fun exportBatchPhoto(
     var adjustments: List<LocalAdjustment> = emptyList()
     val res = try {
         adjustments = edit.adjustments.withSkinFoundOn(app, image, params.io)
-        runCancellableNative(
+        withRenderStallWatchdog(
             onLateResult = { late ->
                 late.reportOutcome(AppRenderOutcome.CANCELLED)
                 late.close()

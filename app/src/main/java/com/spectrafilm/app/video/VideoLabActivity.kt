@@ -3,16 +3,22 @@
  * Film modeling powered by spektrafilm (Andrea Volpato).
  *
  * Phase 2's first milestone (docs/VIDEO_PLAN.md): pick a video, apply a film stock +
- * print paper via the baked 33^3 LUT (GPU preview, CPU export), export a silent MP4.
+ * print paper, preview, export a silent MP4.
  *
- * Deliberately a SEPARATE activity: the photo editor's source/session machinery is
- * built around still images (RAW decode, recipes, export journal) and this beta must
- * not touch it. Video Lab shares only the engine singleton (EngineHolder), the stock
- * catalog widgets, and the theme.
+ * PREVIEW IS CPU-RENDERED, deliberately. The first beta drew frames through a GLES 3.0
+ * 3D-LUT shader (mirroring the editor's experimental GPU preview); on real devices the
+ * viewfinder stayed black — the shader path the editor ships is itself marked
+ * "not yet verified on a real GPU". A phone's video preview must never depend on an
+ * unverified driver path, so both preview and export now run the SAME CPU colour path
+ * (VideoExport.colorizedArgb: photo-decode conversion -> gain -> 33^3 trilinear LUT).
+ * What the user scrubs is pixel-for-pixel what the export writes, on every device.
  *
- * Beta limits, disclosed in the UI: pointwise look only (no grain/halation on
- * video), silent export, SDR clips only, preview decodes frame-by-frame so it runs
- * at decode speed rather than true realtime.
+ * Reversal (slide) films scan directly: the params carry io.scanFilm=true, exactly as
+ * the photo editor's Slide mode — otherwise the bake would print the slide onto
+ * negative paper and the LUT would come out inverted.
+ *
+ * Beta limits, disclosed in the UI: pointwise look only (no grain/halation on video),
+ * silent export, SDR clips only, preview decodes frame-by-frame at decode speed.
  */
 package com.spectrafilm.app.video
 
@@ -28,6 +34,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,10 +65,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.spectrafilm.app.DropdownGroup
 import com.spectrafilm.app.EngineHolder
 import com.spectrafilm.app.GroupedDropdown
@@ -68,8 +79,8 @@ import com.spectrafilm.app.MaterialSymbols
 import com.spectrafilm.app.R
 import com.spectrafilm.app.SpektraTheme
 import com.spectrafilm.app.StockCatalog
-import com.spectrafilm.app.bitmapToLinearProPhoto
 import com.spectrafilm.app.toGroups
+import com.spectrafilm.engine.IoParams
 import com.spectrafilm.engine.SpektraEngine
 import com.spectrafilm.engine.SpektraParams
 import java.io.File
@@ -131,13 +142,13 @@ private fun VideoLabScreen() {
 
     var isPlaying by remember { mutableStateOf(false) }
     var playheadUs by remember { mutableLongStateOf(0L) }
+    var previewFrame by remember { mutableStateOf<ImageBitmap?>(null) }
+    var frameBusy by remember { mutableStateOf(false) }
 
     var exportBusy by remember { mutableStateOf(false) }
     var exportProgress by remember { mutableStateOf<VideoExportProgress?>(null) }
     var exportResult by remember { mutableStateOf<String?>(null) }
     val exportCancelled = remember { AtomicBoolean(false) }
-
-    val surfaceRef = remember { mutableStateOf<VideoLutView?>(null) }
 
     val picker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia(),
@@ -148,7 +159,7 @@ private fun VideoLabScreen() {
         meta = null
         playheadUs = 0L
         isPlaying = false
-        surfaceRef.value?.clearFrame()
+        previewFrame = null
         val opened = VideoClip.open(ctx.applicationContext, uri)
         if (opened == null) {
             error = ctx.getString(R.string.video_lab_open_failed)
@@ -162,19 +173,28 @@ private fun VideoLabScreen() {
         }
     }
 
-    // Bake the preview LUT whenever the look changes (film/paper/clip). SHAPER_SRGB:
-    // the preview shader indexes through the sRGB transfer (see VideoLutSurface).
+    // The look's engine params: a reversal (slide) film scans directly — no print stage —
+    // matching the editor's Slide mode. Without this a slide film's LUT bakes through the
+    // print stage and comes out inverted.
+    fun lookParams(film: String, paper: String): SpektraParams = SpektraParams(
+        filmProfile = film,
+        printProfile = paper,
+        io = IoParams(scanFilm = StockCatalog.isReversalFilm(ctx, film)),
+    )
+
+    // Bake the preview LUT whenever the look changes (film/paper/clip). SHAPER_SRGB is
+    // not used any more (no shader): one LINEAR-lattice bake serves preview and export.
     LaunchedEffect(clip, filmId, paperId) {
         val c = clip ?: return@LaunchedEffect
         if (filmId.isBlank() || paperId.isBlank()) return@LaunchedEffect
         baking = true
         bakeNote = null
-        previewLut = null
+        previewFrame = null
         val result = withContext(Dispatchers.Default) {
             runCatching {
                 val engine = EngineHolder.get(ctx.applicationContext)
-                val params = SpektraParams(filmProfile = filmId, printProfile = paperId)
-                val bake = engine.bakeCubeLut(params, 33, SpektraEngine.SHAPER_SRGB, null)
+                val params = lookParams(filmId, paperId)
+                val bake = engine.bakeCubeLut(params, 33, SpektraEngine.SHAPER_NONE, null)
                 val parsed = TrilinearLut.parse(bake.text)
                     ?: throw VideoExportException("LUT parse failed")
                 // Meter ONE representative frame (the midpoint): one static gain for
@@ -182,7 +202,11 @@ private fun VideoLabScreen() {
                 val probeLong = VideoExport.previewLongEdge(maxOf(c.meta.width, c.meta.height))
                 val bitmap = c.frameArgb(c.meta.durationUs / 2, probeLong)
                     ?: c.frameArgb(0L, probeLong)
-                val g = if (bitmap != null) meterGain(bitmap, engine, params) else 1f
+                val g = if (bitmap != null) {
+                    val v = meterGain(bitmap, engine, params)
+                    bitmap.recycle()
+                    v
+                } else 1f
                 parsed to g
             }
         }
@@ -195,14 +219,12 @@ private fun VideoLabScreen() {
         }
     }
 
-    // Playback loop: decode + submit frames while playing. Decodes at decode speed
-    // (MediaMetadataRetriever has no prefetch); pacing keeps it from outrunning real time.
+    // Playback loop: decode + render + publish frames while playing, paced to real time.
     LaunchedEffect(clip, isPlaying, previewLut) {
         val c = clip
         val lut = previewLut
         if (c == null || lut == null || !isPlaying) return@LaunchedEffect
-        val surface = surfaceRef.value ?: return@LaunchedEffect
-        val longEdge = VideoExport.previewLongEdge(maxOf(c.meta.width, c.meta.height))
+        val edge = VideoExport.previewLongEdge(maxOf(c.meta.width, c.meta.height))
         withContext(Dispatchers.IO) {
             val fps = c.meta.fps.coerceIn(1f, 120f)
             val frameInterval = (1_000_000f / fps).toLong()
@@ -212,10 +234,13 @@ private fun VideoLabScreen() {
             val totalFrames = (c.meta.durationSeconds * fps).toInt()
             while (coroutineContext.isActive && isPlaying && index < totalFrames) {
                 val targetUs = (startUs + index * frameInterval).coerceAtMost(c.meta.durationUs - 1)
-                submitFrame(c, targetUs, surface, lut, gain, longEdge)
+                frameBusy = true
+                val frame = renderPreviewFrame(c, targetUs, lut, gain, edge)
+                if (frame != null) previewFrame = frame
+                frameBusy = false
                 index++
                 playheadUs = targetUs
-                // Pace to real time so the preview matches the clip's own cadence.
+                // Pace to real time minus what the render already took.
                 val targetWall = startWall + index * frameInterval * 1000L
                 val now = System.nanoTime()
                 if (targetWall - now > 0) Thread.sleep((targetWall - now) / 1_000_000L)
@@ -227,15 +252,17 @@ private fun VideoLabScreen() {
         }
     }
 
-    // Scrub: while paused, decode exactly the playhead frame.
+    // Scrub / first frame: while paused, render exactly the playhead frame.
     LaunchedEffect(clip, previewLut, playheadUs, isPlaying) {
         val c = clip
         val lut = previewLut
         if (c == null || lut == null || isPlaying) return@LaunchedEffect
-        val surface = surfaceRef.value ?: return@LaunchedEffect
-        val longEdge = VideoExport.previewLongEdge(maxOf(c.meta.width, c.meta.height))
+        val edge = VideoExport.previewLongEdge(maxOf(c.meta.width, c.meta.height))
         withContext(Dispatchers.IO) {
-            submitFrame(c, playheadUs, surface, lut, gain, longEdge)
+            frameBusy = true
+            val frame = renderPreviewFrame(c, playheadUs, lut, gain, edge)
+            if (frame != null) previewFrame = frame
+            frameBusy = false
         }
     }
 
@@ -248,25 +275,33 @@ private fun VideoLabScreen() {
         )
 
         val m = meta
-        if (m == null) {
-            Box(
-                Modifier.fillMaxWidth().height(220.dp),
-                contentAlignment = Alignment.Center,
-            ) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(240.dp)
+                .background(Color(0xFF101010)),
+            contentAlignment = Alignment.Center,
+        ) {
+            val frame = previewFrame
+            if (frame != null) {
+                Image(
+                    bitmap = frame,
+                    contentDescription = stringResource(R.string.video_lab_preview_cd),
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit,
+                )
+            } else {
                 Text(
-                    stringResource(R.string.video_lab_no_video),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    stringResource(if (m == null) R.string.video_lab_no_video else R.string.video_lab_baking),
+                    color = Color(0xFFB0B0B0),
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
-        } else {
-            AndroidView(
-                modifier = Modifier.fillMaxWidth().height(240.dp),
-                factory = { viewCtx ->
-                    VideoLutView(viewCtx) {
-                        error = ctx.getString(R.string.video_lab_gl_unavailable)
-                    }.also { surfaceRef.value = it }
-                },
-            )
+            if (frameBusy && frame != null) {
+                CircularProgressIndicator(Modifier.height(22.dp))
+            }
+        }
+        if (m != null) {
             Text(
                 "${m.width}×${m.height} · %.1fs · %.0f fps".format(m.durationSeconds, m.fps),
                 style = MaterialTheme.typography.bodySmall,
@@ -375,28 +410,19 @@ private fun VideoLabScreen() {
     }
 }
 
-/**
- * Convert + submit one frame to the GL surface. Runs on a worker thread. The Bitmap
- * goes through bitmapToLinearProPhoto — the photo decode's exact conversion — so
- * video frames enter the LUT in precisely the domain the photo GPU path uses.
- */
-private fun submitFrame(
+/** Decode + colourize one frame for the preview (same path the export writes). */
+private fun renderPreviewFrame(
     clip: VideoClip,
     us: Long,
-    surface: VideoLutView,
     lut: TrilinearLut,
     gain: Float,
     previewLong: Int,
-) {
-    val bitmap = clip.frameArgb(us, previewLong) ?: return
+): ImageBitmap? {
+    val bitmap = clip.frameArgb(us, previewLong) ?: return null
     try {
-        bitmapToLinearProPhoto(bitmap).use { image ->
-            image.acquireDataLease().use { lease ->
-                val fb = lease.data.asFloatBuffer()
-                fb.position(0)
-                surface.submitFrame(fb, image.width, image.height, lut, gain)
-            }
-        }
+        val pixels = VideoExport.colorizedArgb(bitmap, lut, gain, bitmap.width, bitmap.height)
+        return Bitmap.createBitmap(pixels, bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+            .asImageBitmap()
     } finally {
         bitmap.recycle()
     }
@@ -404,14 +430,14 @@ private fun submitFrame(
 
 /** Engine metering on one display-referred frame; returns the linear gain (2^ev). */
 private fun meterGain(bitmap: Bitmap, engine: SpektraEngine, params: SpektraParams): Float =
-    bitmapToLinearProPhoto(bitmap).use { image ->
+    com.spectrafilm.app.bitmapToLinearProPhoto(bitmap).use { image ->
         engine.exposureGain(image, params, null).toFloat()
     }
 
 /**
- * Bake the export LUT (SHAPER_NONE: a linear lattice for the CPU trilinear path —
- * the preview bake's sRGB-shaped lattice is NOT usable here), render frame-by-frame,
- * publish to the gallery, and return the status message.
+ * Bake the export LUT (SHAPER_NONE: a linear lattice for the CPU trilinear path — the
+ * preview uses the SAME bake now, so look params only affect it once), render
+ * frame-by-frame, publish to the gallery, and return the status message.
  */
 private suspend fun runExport(
     appCtx: Context,
@@ -423,7 +449,11 @@ private suspend fun runExport(
     onProgress: (VideoExportProgress) -> Unit,
 ): String = withContext(Dispatchers.Default) {
     val engine = EngineHolder.get(appCtx)
-    val params = SpektraParams(filmProfile = filmId, printProfile = paperId)
+    val params = SpektraParams(
+        filmProfile = filmId,
+        printProfile = paperId,
+        io = IoParams(scanFilm = StockCatalog.isReversalFilm(appCtx, filmId)),
+    )
     val bake = engine.bakeCubeLut(params, 33, SpektraEngine.SHAPER_NONE, null)
     val exportLut = TrilinearLut.parse(bake.text) ?: throw VideoExportException("LUT parse failed")
 

@@ -21,6 +21,11 @@
     <!-- Film / paper browser -->
     <string name="stock_browser_change">পরিবর্তন</string>
     <string name="stock_browser_selected">নির্বাচিত</string>
+    <string name="editor_snack_slide_film_auto">%1$s একটা স্লাইড ফিল্ম — পজিটিভ হিসেবে স্ক্যান করার জন্য Slide mode চালু হয়েছে।</string>
+    <string name="editor_snack_negative_film_print">%1$s একটা নেগেটিভ ফিল্ম — আবার প্রিন্ট পাইপলাইনে ফিরে গেছে।</string>
+    <string name="editor_snack_tungsten_film">%1$s টাংস্টেন-ব্যালান্সড: দিনের আলোয় নীল হয়। এক সুইচে ঠিক করবেন?</string>
+    <string name="editor_snack_balance">স্টকে ব্যালান্স</string>
+    <string name="editor_msg_export_failed_stalled">রেন্ডার খুব বেশি সময় নিচ্ছিল, তাই অ্যাপ ফ্রিজ এড়াতে থামানো হয়েছে। ছোট সাইজে এক্সপোর্ট করুন (Size → Large বা Medium), অথবা ফোন রিস্টার্ট করে আবার চেষ্টা করুন।</string>
 
     <!-- Editor categories -->
     <string name="editor_category_source">সোর্স</string>

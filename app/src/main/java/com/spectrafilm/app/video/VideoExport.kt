@@ -51,6 +51,51 @@ internal object VideoExport {
     }
 
     /**
+     * One display-sRGB frame -> the film look, as packed ARGB. The SHARED colour path
+     * for the preview and the export, so what the user scrubs is exactly what the
+     * encoder writes: bitmapToLinearProPhoto (the photo decode's exact conversion) ->
+     * exposure gain -> 33^3 LUT -> sRGB-encoded display RGB -> ARGB.
+     */
+    internal fun colorizedArgb(
+        sourceBitmap: Bitmap,
+        lut: TrilinearLut,
+        gain: Float,
+        outWidth: Int,
+        outHeight: Int,
+    ): IntArray {
+        val src = if (sourceBitmap.width != outWidth || sourceBitmap.height != outHeight) {
+            // Retriever scaling can be off by a pixel; bilinear resample.
+            Bitmap.createScaledBitmap(sourceBitmap, outWidth, outHeight, true)
+        } else {
+            sourceBitmap
+        }
+        try {
+            val pixels = IntArray(outWidth * outHeight)
+            val display = FloatArray(3)
+            bitmapToLinearProPhoto(src).use { image ->
+                image.acquireDataLease().use { lease ->
+                    val f = lease.data.asFloatBuffer()
+                    // The LUT output is sRGB-encoded display RGB (bake IoParams default:
+                    // outputCctfEncoding=true) — pack it straight into ARGB; NO second
+                    // sRGB encode here.
+                    var i = 0
+                    for (p in pixels.indices) {
+                        lut.apply(f.get(i) * gain, f.get(i + 1) * gain, f.get(i + 2) * gain, display, 0)
+                        val ir = (display[0].coerceIn(0f, 1f) * 255f).toInt()
+                        val ig = (display[1].coerceIn(0f, 1f) * 255f).toInt()
+                        val ib = (display[2].coerceIn(0f, 1f) * 255f).toInt()
+                        pixels[p] = (0xFF shl 24) or (ir shl 16) or (ig shl 8) or ib
+                        i += 3
+                    }
+                }
+            }
+            return pixels
+        } finally {
+            if (src !== sourceBitmap) src.recycle()
+        }
+    }
+
+    /**
      * Run one export. Blocking; call from a worker coroutine. Returns the written
      * file. [isCancelled] is checked between frames; cancellation throws
      * [VideoExportException] after the encoder/muxer are released.
@@ -96,7 +141,6 @@ internal object VideoExport {
             encoder.start()
 
             val planes = VideoYuv.Planes(width, height)
-            val pixels = IntArray(width * height)
 
             var frameIndex = 0
             var drainEnded = false
@@ -113,7 +157,7 @@ internal object VideoExport {
                         val bitmap = clip.frameArgb(us, maxOf(width, height))
                         val image = encoder.getInputImage(inputIndex)
                         if (bitmap != null && image != null) {
-                            colorizeFrame(bitmap, width, height, pixels, planes, lut, exposureGain)
+                            colorizeFrame(bitmap, width, height, planes, lut, exposureGain)
                             writePlanesToImage(planes, image)
                             encoder.queueInputBuffer(inputIndex, 0, frameSizeBytes(width, height), frameIndex * frameIntervalUs, 0)
                         } else {
@@ -175,47 +219,17 @@ internal object VideoExport {
     }
 
     /**
-     * One frame: display sRGB Bitmap -> linear ProPhoto (bitmapToLinearProPhoto — the
-     * photo decode's exact conversion, so video and photo frames enter the LUT in the
-     * same domain) -> gain -> LUT -> sRGB-encoded ARGB -> YUV planes.
+     * One frame: display sRGB Bitmap -> the shared [colorizedArgb] path -> YUV planes.
      */
     private fun colorizeFrame(
         bitmap: Bitmap,
         width: Int,
         height: Int,
-        pixels: IntArray,
         planes: VideoYuv.Planes,
         lut: TrilinearLut,
         gain: Float,
     ) {
-        val src = if (bitmap.width != width || bitmap.height != height) {
-            // Retriever scaling can be off by a pixel; bilinear resample.
-            Bitmap.createScaledBitmap(bitmap, width, height, true)
-        } else {
-            bitmap
-        }
-        try {
-            val display = FloatArray(3)
-            bitmapToLinearProPhoto(src).use { image ->
-                image.acquireDataLease().use { lease ->
-                    val f = lease.data.asFloatBuffer()
-                    // The LUT output is sRGB-encoded display RGB (bake IoParams default:
-                    // outputCctfEncoding=true) — pack it straight into ARGB for the
-                    // YUV converter; NO second sRGB encode here.
-                    var i = 0
-                    for (p in pixels.indices) {
-                        lut.apply(f.get(i) * gain, f.get(i + 1) * gain, f.get(i + 2) * gain, display, 0)
-                        val ir = (display[0].coerceIn(0f, 1f) * 255f).toInt()
-                        val ig = (display[1].coerceIn(0f, 1f) * 255f).toInt()
-                        val ib = (display[2].coerceIn(0f, 1f) * 255f).toInt()
-                        pixels[p] = (0xFF shl 24) or (ir shl 16) or (ig shl 8) or ib
-                        i += 3
-                    }
-                }
-            }
-        } finally {
-            if (src !== bitmap) src.recycle()
-        }
+        val pixels = colorizedArgb(bitmap, lut, gain, width, height)
         VideoYuv.argbToYuv420(pixels, width, height, planes)
     }
 

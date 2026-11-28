@@ -7,10 +7,9 @@
  * linear values directly (no shaper). Order is blue-fastest, matching the .cube
  * format and the engine's emitter: offset = ((ri*N + gi)*N + bi)*3.
  *
- * The preview path does NOT use this class — it uploads the same lattice as a GL
- * texture3D and samples it on the GPU (VideoLutSurface). This class exists so the
- * export can run deterministically without a second GL context, and so the lookup
- * math is unit-testable on the JVM.
+ * Preview and export SHARE this class: both apply the same lattice on the CPU
+ * (VideoExport.colorizedArgb), so the scrubbed preview is pixel-identical to the
+ * export, with no second GL context and lookup math that is unit-testable on the JVM.
  */
 package com.spectrafilm.app.video
 
