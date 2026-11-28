@@ -51,8 +51,8 @@ android {
         applicationId = "com.spectrafilm.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 17
-        versionName = "1.2.0"
+        versionCode = 18
+        versionName = "1.2.1"
         testInstrumentationRunner = "com.spectrafilm.app.ReleaseCandidateSmokeInstrumentation"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
     }

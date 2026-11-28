@@ -1,5 +1,27 @@
 # Changelog
 
+## v1.2.1 (versionCode 18) — 2026-11-27 — field-report fixes for the Video Lab beta
+
+**Bugfix: nothing new, three things fixed.** From real-device testing of v1.2.0.
+
+### Fixed
+
+- **Export no longer hangs at 11%:** a full-resolution render that wedges (GPU/driver or
+  memory pressure) is now watched — a slow render is stopped after a grace period and the
+  export shows a clear message ("try a smaller export size") instead of freezing; a wedged
+  one raises that message after 4 minutes. Low-memory devices also start the export sheet
+  at a smaller default size (the user's own choice always wins afterwards).
+- **Slide-film previews render as positives:** Ektachrome and other reversal stocks used to
+  show inverted, muddy tiles because candidates printed onto negative paper. The preview
+  tiles now scan directly (Slide mode), picking a slide film turns Slide mode on right away
+  (undoable), picking a negative film turns it back off, and tungsten stocks (CineStill 800T
+  & co.) offer a one-switch balance correction when they look strongly blue in daylight.
+- **Video Lab viewfinder shows picture:** the first beta drew frames through an
+  unverified GPU path that stayed black on real devices. Preview and export now share one
+  CPU colour path, so what you scrub is pixel-for-pixel what the export writes; playback
+  runs paced to real time and scrubbing renders the playhead frame. Reversal films bake
+  their LUT as positives too.
+
 ## Unreleased
 
 ## v1.0.0 (versionCode 15) — 2026-11-10 — full-resolution exports with every effect, Crop and Frame tabs
